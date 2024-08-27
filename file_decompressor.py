@@ -21,8 +21,7 @@ class FileDecompressor:
             except AttributeError:
                 sys.exit('Windows version >=8.')
 
-            RtlGetCompressionWorkSpaceSize = \
-                ctypes.windll.ntdll.RtlGetCompressionWorkSpaceSize
+            RtlGetCompressionWorkSpaceSize = ctypes.windll.ntdll.RtlGetCompressionWorkSpaceSize
 
             with open(self.input_file, 'rb') as fin:
                 header = fin.read(8)
@@ -49,9 +48,7 @@ class FileDecompressor:
                 ntCompressBufferWorkSpaceSize = self.ULONG()
                 ntCompressFragmentWorkSpaceSize = self.ULONG()
 
-                ntstatus = RtlGetCompressionWorkSpaceSize(self.USHORT(calgo),
-                                                          ctypes.byref(ntCompressBufferWorkSpaceSize),
-                                                          ctypes.byref(ntCompressFragmentWorkSpaceSize))
+                ntstatus = RtlGetCompressionWorkSpaceSize(self.USHORT(calgo), ctypes.byref(ntCompressBufferWorkSpaceSize), ctypes.byref(ntCompressFragmentWorkSpaceSize))
 
                 if ntstatus:
                     sys.exit(f'[Error] Failed to get workspace size. Error code: {self.to_hex(ntstatus, 32)}')
