@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bad Request</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"> <!-- Roboto Font -->
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #111, #222);
+            color: white;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: rgba(17, 17, 17, 0.034);
+            backdrop-filter: blur(30px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.219);
+            border-bottom: 1px solid #33333310;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background: rgba(255, 0, 0, 0.014);
+        }
+
+        .nav-links li a:hover {
+            background-color: #383846;
+            box-shadow: 0px 15px 15px rgba(255, 0, 0, 0.219);
+        }
+
+        .not-found-container {
+            text-align: center;
+            margin-top: 7%;
+            font-size: 18px;
+        }
+
+        #go-back {
+            padding: 10px 0;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 18px;
+            color: yellow;
+            text-decoration: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #go-back:hover {
+            color: green;
+        }
+
+        #titlePageNotFound {
+            color: red;
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/evidenceAnalysis">Evidence Analysis</a></li>
+        </ul>
+    </nav>
+
+    <div class="not-found-container">
+        <h1 id="titleBadRequest">Bad Request</h1>
+        <p>The server could not understand the request due to invalid syntax.</p>
+        <a href="/" class="nav-link" id="go-back">Go Back</a>
+    </div>
+</body>
+</html>

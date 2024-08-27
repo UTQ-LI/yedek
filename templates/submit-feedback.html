@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+
+    <style>
+        * {
+            font-family: "Roboto", sans-serif;
+        }
+
+        nav {
+            background-color: red;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-radius: 10px;
+        }
+
+        #title {
+            font-size: 24px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-link:hover {
+            color: yellow;
+        }
+
+        #Turkey_Flag {
+            width: 91px;
+            height: auto;
+        }
+
+        .not-found-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #go-back {
+            color: black;
+            margin-top: 20px;
+        }
+
+        #go-back:hover {
+            color: red;
+        }
+
+        #titlePageNotFound {
+            color: red;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+<body>
+    <nav>
+        <a href="/" id="title">Evidence Analysis</a>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/1280px-Flag_of_Turkey.svg.png" alt="Flag_of_Turkey" id="Turkey_Flag">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/evidenceAnalysis" class="nav-link">Evidence Analysis</a>
+        </div>
+    </nav>
+
+    <div class="not-found-container">
+        <h1 id="titlePageNotFound">Thank You For Your Feedback!</h1>
+        <p>We will reach you via your email as soon as possible...</p>
+        <a href="/" class="nav-link" id="go-back">Go Back</a>
+    </div>
+
+</body>
+</html>

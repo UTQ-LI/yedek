@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Analysis</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #111, #222);
+            color: white;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: rgba(17, 17, 17, 0.034);
+            backdrop-filter: blur(30px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.219);
+            border-bottom: 1px solid #33333310;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background: rgba(255, 0, 0, 0.014);
+        }
+
+        .nav-links li a:hover {
+            background-color: #383846;
+            box-shadow: 0px 15px 15px rgba(255, 0, 0, 0.219);
+        }
+
+        .content {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: rgba(17, 17, 17, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0px 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .card h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #00ffff;
+        }
+
+        .card p {
+            font-size: 1em;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .toggle-button {
+            background-color: #00ffff;
+            color: #111;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-button:hover {
+            background-color: #009999;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .page-link {
+            padding: 10px 15px;
+            background-color: rgba(17, 17, 17, 0.9);
+            color: #00ffff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .page-link:hover {
+            background-color: #383846;
+            color: white;
+        }
+
+        .page-link.active {
+            font-weight: bold;
+            background-color: #00ffff;
+            color: #111;
+        }
+
+        .details-container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            padding: 20px;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-color: rgba(17, 17, 17, 0.9);
+            border-radius: 20px;
+            transition: box-shadow 0.5s ease;
+        }
+
+        .details-container:hover {
+            box-shadow: 0 0px 50px rgba(0, 0, 255, 0.5);
+        }
+
+        .details h2 {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .details p {
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .details hidden{
+            display: none;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            margin-left: 2%;
+        }
+
+        #values{
+            padding-left: 5%;
+            padding-right: 5%;
+        }
+
+        #ai{
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <script>
+        function toggleDetails(key) {
+            const detailsContainers = document.querySelectorAll('.details');
+            const toggleButton = document.getElementById("toggle-button-" + key);
+            const currentDetails = document.getElementById("details-" + key);
+
+            detailsContainers.forEach(container => {
+                if (container !== currentDetails) {
+                    container.classList.add('hidden');
+                }
+            });
+
+            if (currentDetails.classList.contains('hidden')) {
+                currentDetails.classList.remove('hidden');
+                toggleButton.textContent = "Detayları Gizle";
+            } else {
+                currentDetails.classList.add('hidden');
+                toggleButton.textContent = "Detayları Göster";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const itemsPerPage = 5;
+            let currentPage = 1;
+            const dataItems = document.querySelectorAll('.data-item');
+            const totalPages = Math.ceil(dataItems.length / itemsPerPage);
+
+            function displayPage(page) {
+                dataItems.forEach((item, index) => {
+                    item.style.display = 'none';
+                    if (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) {
+                        item.style.display = 'block';
+                    }
+                });
+                updatePagination();
+            }
+
+            function updatePagination() {
+                const paginationContainer = document.getElementById('pagination-container');
+                paginationContainer.innerHTML = '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageLink = document.createElement('span');
+                    pageLink.className = 'page-link';
+                    pageLink.textContent = i;
+                    if (i === currentPage) {
+                        pageLink.classList.add('active');
+                    }
+                    pageLink.addEventListener('click', () => {
+                        currentPage = i;
+                        displayPage(currentPage);
+                    });
+                    paginationContainer.appendChild(pageLink);
+                }
+            }
+
+            displayPage(currentPage);
+        });
+    </script>
+
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><p>IP: {{ip}}</p></li>
+            <li><p>Country: {{country}}</p></li>
+        </ul>
+    </nav>
+
+    <div id="content-container" class="content">
+        {% for key, value in location.items() %}
+            <div class="data-item card">
+                <h2>{{ key }}</h2>
+                <button class="toggle-button" id="toggle-button-{{ key }}" onclick="toggleDetails('{{ key }}')">Detayları Göster</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="pagination" id="pagination-container"></div>
+
+    <div class="details-container">
+        {% for key, value in location.items() %}
+            <div id="details-{{ key }}" class="details hidden">
+                {% if ai == "Şu Anda Yapay Zeka Devre Dışıdır!" %}
+                    <h3 style="text-align: center;">Öneri: <span style="color: red;">{{ai}}</span></h3>
+                {% else %}
+                    <h3 style="text-align: center;">Öneri: <span style="color: green;">{{ai}}</span></h3>
+                {% endif %}
+                <h2 style="margin-left: 1%;">{{ key }}:</h2>
+                <div id="values">
+                    {% if value is none %}
+                        <p>None</p>
+                    {% else %}
+                        {% if value is sequence and not value is string %}
+                            {% for item in value %}
+                                {% for k, v in item.items() %}
+                                    {% if k == "number" %}
+                                        <!-- PASS -->
+                                    {% elif k == "File Executed Times" %}
+                                        <p style="color: red;">{{ k }}:</p>
+                                        {% for time in v %}
+                                            <p style="padding-left: 2%;">{{ time }}</p>
+                                        {% endfor %}
+                                    {% elif k == "Volumes" %}
+                                        <p style="color: red;">{{ k }}:</p>
+                                        {% for volume in v %}
+                                            <p style="padding-left: 2%;">{{ volume }}</p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p><span style="color: red;">{{ k }}:</span> {{ v }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                                <hr>
+                            {% endfor %}
+                        {% else %}
+                            <p><span style="color: red;">{{ key }}:</span> {{ value }}</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
