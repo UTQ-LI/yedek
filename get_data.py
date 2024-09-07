@@ -1,4 +1,5 @@
-import winreg, os, socket, sqlite3, file_decompressor, pf_data, getSID, getProccesses, threading, datetime
+import winreg, os, socket, sqlite3, file_decompressor, pf_data, getSID, getProccesses, threading, shutil, GetChromeData
+from datetime import timedelta, datetime
 from colorama import Fore
 
 class Functions:
@@ -6,9 +7,12 @@ class Functions:
         self.errorFile = "errors.txt"
         self.logFile = "logs.log"
 
+    def bytes_to_mb(self, bytes_value):
+        return bytes_value / (1024 * 1024)
+
     def saveLog(self, LOG=None):
         with open(self.logFile, "a") as log:
-            now = datetime.datetime.now()
+            now = datetime.now()
             log.write(f"{now} : {LOG}\n")
 
     def get_regedit(self, hkey, regedit_key, file_name):
@@ -53,7 +57,7 @@ class Functions:
             print(f'{Fore.RED}Error! {e}{Fore.RESET}')
             return None
 
-    def get_location(self, location, file_name, option=None):
+    def get_location(self, location, file_name, option=None, SQLiteCommand=None):
         result = []
         try:
             print(f"{file_name} yapılıyor...")
@@ -105,40 +109,70 @@ class Functions:
                                 else:
                                     self.saveLog(f"({root}) {file} ({fileHeader}): Unknown file header!")
                                     print(f'{Fore.RED}Unknown file header! ({fileHeader}) File Path: {filePath}{Fore.RESET}')
-                                    return None
+                                    result.append({"number": 0, "File Name": file_name, "Error": "Unknown file header!"})
 
                             else:
                                 with open(filePath, "rb") as File:
-                                    file_content = File.read().replace(b"\x00", b"").replace(b"\xff", b"")
-                                    self.saveLog(f"({root}) {file} : readed")
+                                    if File.read(len("SQLite format 3")) != b"SQLite format 3":
+                                        file_content = File.read().replace(b"\x00", b"").replace(b"\xff", b"")
+                                        self.saveLog(f"({root}) {file} : readed")
+                                    else:
+                                        if SQLiteCommand is None:
+                                            file_content = File.read().replace(b"\x00", b"").replace(b"\xff", b"")
+                                            self.saveLog(f"({root}) {file} : readed")
+                                        else:
+                                            # SQLite Kodu eklenecek
+                                            pass
 
                                 result.append({"number": 0, "File Name": filePath, "File Content": file_content})
                 except PermissionError:
                     print(f'{Fore.RED}Permission denied! File Path: {location}{Fore.RESET}')
                     self.saveLog(f"{location} : Permission denied")
-                    return result.append({"number": 0, "File Name": file_name, "File Content": "Permission denied"})
+                    result.append({"number": 0, "File Name": file_name, "Error": "Permission denied"})
+                    return result
+                except FileNotFoundError:
+                    print(f'{Fore.RED}File not found! File Path: {location}{Fore.RESET}')
+                    self.saveLog(f"{location} : File not found")
+                    result.append({"number": 0, "File Name": file_name, "Error": "File not found"})
+                    return result
                 except Exception as e:
                     self.saveLog(f"Error: {file_name} : {e}")
                     print(f"{Fore.RED}Error: {file_name} : {e}{Fore.RESET}")
-                    return None
+                    result.append({"number": 0, "File Name": file_name, "Error": e})
+                    return result
 
                 return result
 
             elif option == 1:
                 try:
                     with open(location, "rb") as File:
-                        self.saveLog(f"({location}) read : {file_name}")
-                        file_content = File.read().replace(b'\x00', b'').replace(b'\xff', b'')
+                        if File.read(len("SQLite format 3")) != b"SQLite format 3":
+                            self.saveLog(f"({location}) read : {file_name}")
+                            file_content = File.read().replace(b'\x00', b'').replace(b'\xff', b'')
+                        else:
+                            if SQLiteCommand is None:
+                                file_content = File.read().replace(b"\x00", b"").replace(b"\xff", b"")
+                                self.saveLog(f"({location}) read : {file_name}")
+                            else:
+                                # SQLite Kodu eklenecek
+                                pass
 
                     result.append({"number": 0, "File Name": file_name, "File Content": file_content})
                 except PermissionError:
                     self.saveLog(f"{location} : Permission denied")
                     print(f'{Fore.RED}Permission denied! File Path: {location}{Fore.RESET}')
-                    return result.append({"number": 0, "File Name": file_name, "File Content": "Permission denied"})
+                    result.append({"number": 0, "File Name": file_name, "Error": "Permission denied"})
+                    return result
+                except FileNotFoundError:
+                    self.saveLog(f"{location} : File not found")
+                    print(f'{Fore.RED}File not found! File Path: {location}{Fore.RESET}')
+                    result.append({"number": 0, "File Name": file_name, "Error": "File not found"})
+                    return result
                 except Exception as e:
                     self.saveLog(f"Error: {file_name} : {e}")
                     print(f"{Fore.RED}Error: {file_name} : {e}{Fore.RESET}")
-                    return None
+                    result.append({"number": 0, "File Name": file_name, "Error": e})
+                    return result
 
                 return result
 
@@ -149,7 +183,9 @@ class Functions:
         except Exception as e:
             self.saveLog(f"Error: {file_name} : {e}")
             print(f"{Fore.RED}Error: {file_name} : {e}{Fore.RESET}")
-            return None
+            result.append({"number": 0, "File Name": file_name, "Error": e})
+            return result
+
 
 Functions = Functions()
 
@@ -363,7 +399,7 @@ class Browser_Activity:
         edge_location = rf"{os.environ.get('USERPROFILE')}AppData\Local\MicrosoftEdge\User\Default"
 
         Tuple.getLocationTuple["Firefox History"] = Functions.get_location(firefox_location, "FirefoxHistory.txt")
-        Tuple.getLocationTuple["Chrome History"] = Functions.get_location(chrome_location, "ChromeHistory.txt")
+        Tuple.getLocationTuple["Chrome History"] = GetChromeData.GetChromeHistory().get_browser_history(chrome_location, Functions)
         Tuple.getLocationTuple["Edge History"] = Functions.get_location(edge_location, "EdgeHistory.txt")
 
     def MediaHistory(self):
@@ -395,7 +431,7 @@ class Browser_Activity:
         Tuple.getLocationTuple["Chrome Web Data"] = Functions.get_location(chrome_location_WebData, "ChromeWebData.txt", 1)
         Tuple.getLocationTuple["Chrome Shortcuts"] = Functions.get_location(chrome_location_Shortcuts, "ChromeShortcuts.txt", 1)
         Tuple.getLocationTuple["Chrome Network Action Predictor"] = Functions.get_location(chrome_location_NetworkActionPredictor, "ChromeNetworkActionPredictor.txt", 1)
-        Tuple.getLocationTuple["Chrome Login Data"] = Functions.get_location(chrome_location_LoginData, "ChromeLoginData.txt", 1)
+        Tuple.getLocationTuple["Chrome Login Data"] = GetChromeData.GetChromeLoginData().get_login_data(chrome_location_LoginData, Functions)
 
         Tuple.getLocationTuple["Edge History"] = Functions.get_location(edge_location_history, "EdgeHistory.txt", 1)
         Tuple.getLocationTuple["Edge Web Data"] = Functions.get_location(edge_location_WebData, "EdgeWebData.txt", 1)
@@ -432,10 +468,10 @@ class Browser_Activity:
         Tuple.getLocationTuple["Edge Login Data"] = Functions.get_location(edge_location_login_data, "EdgeLoginData.txt", 1)
 
     def Browser_Downloads(self):
-        chrome_location_downloads = rf"{os.environ.get('USERPROFILE')}\AppData\Local\Google\Chrome\User Data\Default\History"
+        chrome_downloads = rf"{os.environ.get('USERPROFILE')}\AppData\Local\Google\Chrome\User Data\Default\History"
         edge_location_downloads = rf"{os.environ.get('USERPROFILE')}AppData\Local\MicrosoftEdge\User\Default\History"
 
-        Tuple.getLocationTuple["Chrome History"] = Functions.get_location(chrome_location_downloads, "ChromeHistory.txt", 1)
+        Tuple.getLocationTuple["Chrome Downloads"] = GetChromeData.GetChromeDownloadHistory().get_browser_download_history(chrome_downloads, Functions)
         Tuple.getLocationTuple["Edge History"] = Functions.get_location(edge_location_downloads, "EdgeHistory.txt", 1)
 
     def Extensions(self):

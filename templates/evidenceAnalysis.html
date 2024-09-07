@@ -268,7 +268,7 @@
     <div class="pagination" id="pagination-container"></div>
 
     <div class="details-container">
-        {% for key, value in location.items() %}
+                {% for key, value in location.items() %}
             <div id="details-{{ key }}" class="details hidden">
                 {% if ai == "Şu Anda Yapay Zeka Devre Dışıdır!" %}
                     <h3 style="text-align: center;">Öneri: <span style="color: red;">{{ai}}</span></h3>
